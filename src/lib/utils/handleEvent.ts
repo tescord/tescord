@@ -1,12 +1,12 @@
-import { Tessen, TessenClient } from "$lib/Tessen";
-import { TessenClientEventMap } from "$types/ClientEvents";
+import { Tescord, TescordClient } from "$lib/Tescord";
+import { TescordClientEventMap } from "$types/ClientEvents";
 import { ContentValue } from "$lib/Locale";
 import { Guild, User, Interaction } from "discord.js";
 import { handleInteraction } from "./handleInteraction";
 
 // Helper to extract guild, user, and interaction from event context
 function extractContextInfo(eventName: string, args: any[]): { guild: Guild | null, user: User | null, interaction: Interaction | null } {
-  const eventParams = TessenClientEventMap[eventName as keyof typeof TessenClientEventMap];
+  const eventParams = TescordClientEventMap[eventName as keyof typeof TescordClientEventMap];
   if (!eventParams) return { guild: null, user: null, interaction: null };
 
   let guild: Guild | null = null;
@@ -50,19 +50,19 @@ function extractContextInfo(eventName: string, args: any[]): { guild: Guild | nu
 
 // Helper function to create localization objects for events
 function createEventLocalizationObjects(
-  tessen: Tessen,
+  tescord: Tescord,
   guild: Guild | null,
   interaction: Interaction | null
 ) {
-  // Get default language from Tessen config, fallback to 'en'
-  const defaultLanguage = tessen.config.defaults?.language || 'en';
-  const defaultLocalization = tessen.locales.content.get(defaultLanguage) || {} as ContentValue;
+  // Get default language from Tescord config, fallback to 'en'
+  const defaultLanguage = tescord.config.defaults?.language || 'en';
+  const defaultLocalization = tescord.locales.content.get(defaultLanguage) || {} as ContentValue;
   
   const guildLocale = guild?.preferredLocale?.split('-')[0] || defaultLanguage;
   const userLocale = interaction?.locale?.split('-')[0] || guildLocale;
   
-  const guildLocalization = tessen.locales.content.get(guildLocale) || defaultLocalization;
-  const userLocalization = tessen.locales.content.get(userLocale) || defaultLocalization;
+  const guildLocalization = tescord.locales.content.get(guildLocale) || defaultLocalization;
+  const userLocalization = tescord.locales.content.get(userLocale) || defaultLocalization;
 
   return {
     locale: {
@@ -73,13 +73,13 @@ function createEventLocalizationObjects(
 }
 
 export async function handleEvent(
-  tessen: Tessen,
-  client: TessenClient,
-  eventName: keyof typeof TessenClientEventMap,
+  tescord: Tescord,
+  client: TescordClient,
+  eventName: keyof typeof TescordClientEventMap,
   args: any[]
 ) {
   try {
-    const eventParams = TessenClientEventMap[eventName];
+    const eventParams = TescordClientEventMap[eventName];
     if (!eventParams) return;
 
     // Create event context object
@@ -89,7 +89,7 @@ export async function handleEvent(
 
     // Handle interaction events separately
     if (eventName === 'interactionCreate' && context.interaction) {
-      await handleInteraction(tessen, client, context.interaction as Interaction);
+      await handleInteraction(tescord, client, context.interaction as Interaction);
     }
 
     // Extract guild, user, and interaction for localization
@@ -97,7 +97,7 @@ export async function handleEvent(
 
     // Add localization objects to context
     const localizationObjects = createEventLocalizationObjects(
-      tessen,
+      tescord,
       guild,
       interaction
     );
@@ -108,7 +108,7 @@ export async function handleEvent(
     };
 
     // Handle registered events
-    for (const [key, cachedEvent] of tessen.cache.events) {
+    for (const [key, cachedEvent] of tescord.cache.events) {
       const eventData = cachedEvent.data;
       
       if (eventData.event === eventName) {
@@ -117,10 +117,10 @@ export async function handleEvent(
     }
 
     // Emit to pack event emitters
-    tessen.events.emit(eventName, enhancedContext);
+    tescord.events.emit(eventName, enhancedContext);
     
   } catch (error) {
-    tessen.events.emit('tessen:eventHandlerError', {
+    tescord.events.emit('tescord:eventHandlerError', {
       error,
       eventName,
       args,

@@ -17,7 +17,7 @@ export const CUSTOM_DATA_NUMBER_INDICATOR = "㥻";
 
 // Global interface that can be extended by modules
 declare global {
-  namespace Tessen {
+  namespace Tescord {
     interface CustomDataTypes {
       // Default types - these are always available
       string: string;
@@ -32,7 +32,7 @@ declare global {
 }
 
 // Type helper to extract all custom data types
-export type CustomDataValue = Tessen.CustomDataTypes[keyof Tessen.CustomDataTypes];
+export type CustomDataValue = Tescord.CustomDataTypes[keyof Tescord.CustomDataTypes];
 
 // Recursive partial type for deep partial objects
 export type DeepPartial<T> = {
@@ -70,46 +70,46 @@ export type BuiltSelectMenuComponent =
 export type BuiltComponent = BuiltButtonComponent | BuiltSelectMenuComponent | BuiltModalComponent;
 
 // Conditional return type based on component type
-export type BuiltComponentReturn<T extends keyof Tessen.ComponentMap> = 
-  Tessen.ComponentMap[T] extends 'Button' 
+export type BuiltComponentReturn<T extends keyof Tescord.ComponentMap> = 
+  Tescord.ComponentMap[T] extends 'Button' 
     ? BuiltButtonComponent
-    : Tessen.ComponentMap[T] extends 'StringSelectMenu'
+    : Tescord.ComponentMap[T] extends 'StringSelectMenu'
     ? BuiltStringSelectMenuComponent
-    : Tessen.ComponentMap[T] extends 'UserSelectMenu'
+    : Tescord.ComponentMap[T] extends 'UserSelectMenu'
     ? BuiltUserSelectMenuComponent
-    : Tessen.ComponentMap[T] extends 'RoleSelectMenu'
+    : Tescord.ComponentMap[T] extends 'RoleSelectMenu'
     ? BuiltRoleSelectMenuComponent
-    : Tessen.ComponentMap[T] extends 'ChannelSelectMenu'
+    : Tescord.ComponentMap[T] extends 'ChannelSelectMenu'
     ? BuiltChannelSelectMenuComponent
-    : Tessen.ComponentMap[T] extends 'MentionableSelectMenu'
+    : Tescord.ComponentMap[T] extends 'MentionableSelectMenu'
     ? BuiltMentionableSelectMenuComponent
-    : Tessen.ComponentMap[T] extends 'Modal'
+    : Tescord.ComponentMap[T] extends 'Modal'
     ? BuiltModalComponent
     : BuiltComponent; // Fallback for unknown types
 
 // Component build configuration with flexible data typing
-export interface ComponentBuildConfig<T extends keyof Tessen.ComponentMap = keyof Tessen.ComponentMap> {
+export interface ComponentBuildConfig<T extends keyof Tescord.ComponentMap = keyof Tescord.ComponentMap> {
   id: T;
   data?: CustomDataValue[];
-  overrides?: Tessen.ComponentMap[T] extends 'Button' 
+  overrides?: Tescord.ComponentMap[T] extends 'Button' 
     ? DeepPartial<ButtonComponentOptions>
-    : Tessen.ComponentMap[T] extends 'StringSelectMenu'
+    : Tescord.ComponentMap[T] extends 'StringSelectMenu'
     ? DeepPartial<StringSelectMenuComponentOptions>
-    : Tessen.ComponentMap[T] extends 'UserSelectMenu'
+    : Tescord.ComponentMap[T] extends 'UserSelectMenu'
     ? DeepPartial<UserSelectMenuComponentOptions>
-    : Tessen.ComponentMap[T] extends 'RoleSelectMenu'
+    : Tescord.ComponentMap[T] extends 'RoleSelectMenu'
     ? DeepPartial<RoleSelectMenuComponentOptions>
-    : Tessen.ComponentMap[T] extends 'ChannelSelectMenu'
+    : Tescord.ComponentMap[T] extends 'ChannelSelectMenu'
     ? DeepPartial<ChannelSelectMenuComponentOptions>
-    : Tessen.ComponentMap[T] extends 'MentionableSelectMenu'
+    : Tescord.ComponentMap[T] extends 'MentionableSelectMenu'
     ? DeepPartial<MentionableSelectMenuComponentOptions>
-    : Tessen.ComponentMap[T] extends 'Modal'
+    : Tescord.ComponentMap[T] extends 'Modal'
     ? DeepPartial<ModalComponentOptions>
     : DeepPartial<ButtonComponentOptions | SelectMenuComponentOptions | ModalComponentOptions>; // Fallback for unknown types
 }
 
 // Helper type to ensure component ID exists in the map
-export type ValidComponentId = keyof Tessen.ComponentMap;
+export type ValidComponentId = keyof Tescord.ComponentMap;
 
 // Updated utility functions with sequential event processing
 export async function encodeCustomData(
@@ -130,7 +130,7 @@ export async function encodeCustomData(
   // Emit event to allow packs to process custom data types sequentially
   if (eventEmitter) {
     // Process listeners one by one to avoid race conditions
-    for await (const result of eventEmitter.emitAsync('tessen:customData:encode', eventData)) {
+    for await (const result of eventEmitter.emitAsync('tescord:customData:encode', eventData)) {
       // Each listener can modify the eventData arrays
       // Process completes when all listeners have finished
     }
@@ -174,7 +174,7 @@ export async function parseCustomData(
   // Emit event to allow packs to process custom data types sequentially
   if (eventEmitter) {
     // Process listeners one by one to avoid race conditions
-    for await (const result of eventEmitter.emitAsync('tessen:customData:decode', eventData)) {
+    for await (const result of eventEmitter.emitAsync('tescord:customData:decode', eventData)) {
       // Each listener can modify the eventData arrays
       // Process completes when all listeners have finished
     }
@@ -211,7 +211,7 @@ export function encodeCustomDataSync(
 
   // Emit event synchronously
   if (eventEmitter) {
-    eventEmitter.emit('tessen:customData:encode', eventData);
+    eventEmitter.emit('tescord:customData:encode', eventData);
   }
 
   // Process remaining unhandled items with default logic
@@ -251,7 +251,7 @@ export function parseCustomDataSync(
 
   // Emit event synchronously
   if (eventEmitter) {
-    eventEmitter.emit('tessen:customData:decode', eventData);
+    eventEmitter.emit('tescord:customData:decode', eventData);
   }
 
   // Process remaining unhandled items with default logic

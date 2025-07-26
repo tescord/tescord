@@ -1,8 +1,8 @@
-// tessen is a discord.js based library for creating bots
-// tessen syntax is similar to express.js
-import { Tessen, Pack, Inspector, Locales } from 'tessen';
-// tessen pack'in extendidir
-const tessen = new Tessen();
+// tescord is a discord.js based library for creating bots
+// tescord syntax is similar to express.js
+import { Tescord, Pack, Inspector, Locales } from 'tescord';
+// tescord pack'in extendidir
+const tescord = new Tescord();
 
 const pack = new Pack({ id: 'ExamplePack' });
 const inspector = new Inspector({ id: 'ExampleInspector', domain: "CurrentPack|AllSubPacks" });
@@ -59,11 +59,11 @@ inspector.button({
 pack.use(inspector);  // () => { } // unloader
 pack.use(locales);  // () => { } // unloader
 
-tessen.use(pack);  // () => { } // unloader
-tessen.use(chatCommandExtension({
+tescord.use(pack);  // () => { } // unloader
+tescord.use(chatCommandExtension({
   prefix: "!"
 }))
-tessen.slashCommand({
+tescord.slashCommand({
   id: 'example',
   name: 'example (command)?', // []
   description: 'an example command',
@@ -75,6 +75,6 @@ tessen.slashCommand({
   }
 }); // () => { } // unloader
 
-tessen.start();
+tescord.start();
 
 // TODO: add proxy support for more rate limits, see @discordjs/proxy

@@ -1,4 +1,4 @@
-import { Tessen, TessenClient } from "$lib/Tessen";
+import { Tescord, TescordClient } from "$lib/Tescord";
 import {
   ChannelType,
   InteractionContextType,
@@ -154,7 +154,7 @@ function convertToSnakeCase(obj: any): any {
 }
 
 // Type for our command structure that matches Discord API expectations
-interface TessenApplicationCommand {
+interface TescordApplicationCommand {
   name: string;
   type: ApplicationCommandType.ChatInput;
   description: string;
@@ -185,7 +185,7 @@ function createCommandOption(
         ...(option.choices && {
           choices: Object.entries(option.choices).map(([key, name]) => ({
             name: String(name),
-            value: String(key), // Key is the value in Tessen
+            value: String(key), // Key is the value in Tescord
           })),
         }),
         ...(option.autoComplete && { autocomplete: true }),
@@ -200,7 +200,7 @@ function createCommandOption(
         ...(option.choices && {
           choices: Object.entries(option.choices).map(([key, name]) => ({
             name: String(name),
-            value: Number(key), // Key is the value in Tessen
+            value: Number(key), // Key is the value in Tescord
           })),
         }),
         ...(option.autoComplete && { autocomplete: true }),
@@ -215,7 +215,7 @@ function createCommandOption(
         ...(option.choices && {
           choices: Object.entries(option.choices).map(([key, name]) => ({
             name: String(name),
-            value: Number(key), // Key is the value in Tessen
+            value: Number(key), // Key is the value in Tescord
           })),
         }),
         ...(option.autoComplete && { autocomplete: true }),
@@ -282,11 +282,11 @@ function getDiscordLocales(internalLocale: string): string[] {
 
 // Helper function to get localized data for interactions
 function getLocalizedInteractionData(
-  tessen: Tessen,
+  tescord: Tescord,
   interactionId: string,
   locale: string,
 ): CommandInteractionLocale | undefined {
-  const interactionLocales = tessen.locales.interaction.get(locale);
+  const interactionLocales = tescord.locales.interaction.get(locale);
   if (!interactionLocales) return undefined;
 
   // Look for the interaction by ID and ensure proper typing
@@ -303,13 +303,13 @@ function getLocalizedInteractionData(
 
 // Helper function to get localized name for a specific command combination
 function getLocalizedCommandName(
-  tessen: Tessen,
+  tescord: Tescord,
   interactionId: string,
   commandName: string,
   locale: string,
 ): string | undefined {
   const localizedData = getLocalizedInteractionData(
-    tessen,
+    tescord,
     interactionId,
     locale,
   );
@@ -341,13 +341,13 @@ function getLocalizedCommandName(
 
 // Helper function to get localized name parts for subcommands/groups
 function getLocalizedNameParts(
-  tessen: Tessen,
+  tescord: Tescord,
   interactionId: string,
   originalCombination: string,
   locale: string,
 ): { base?: string; group?: string; subcommand?: string } | undefined {
   const localizedData = getLocalizedInteractionData(
-    tessen,
+    tescord,
     interactionId,
     locale,
   );
@@ -381,8 +381,8 @@ function getLocalizedNameParts(
 
 // Helper function to localize command names and descriptions
 function localizeCommand(
-  tessen: Tessen,
-  command: TessenApplicationCommand,
+  tescord: Tescord,
+  command: TescordApplicationCommand,
   interactionId: string,
   commandName: string,
 ): Record<string, { name?: string; description?: string }> {
@@ -390,9 +390,9 @@ function localizeCommand(
     {};
 
   // Process each available locale
-  for (const [locale, _] of tessen.locales.interaction) {
+  for (const [locale, _] of tescord.locales.interaction) {
     const localizedData = getLocalizedInteractionData(
-      tessen,
+      tescord,
       interactionId,
       locale,
     );
@@ -407,7 +407,7 @@ function localizeCommand(
 
         // For slash commands, try to get the localized name for this specific command combination
         const localizedName = getLocalizedCommandName(
-          tessen,
+          tescord,
           interactionId,
           commandName,
           locale,
@@ -428,7 +428,7 @@ function localizeCommand(
 
 // Helper function to build localization maps for subcommand options (non-nested)
 function buildSubcommandOptionLocalizations(
-  tessen: Tessen,
+  tescord: Tescord,
   options: readonly ApplicationCommandOptionData[],
   interactionId: string,
 ): ApplicationCommandOptionData[] {
@@ -441,9 +441,9 @@ function buildSubcommandOptionLocalizations(
     > = {};
 
     // Collect localizations for each available locale
-    for (const [locale, _] of tessen.locales.interaction) {
+    for (const [locale, _] of tescord.locales.interaction) {
       const localizedData = getLocalizedInteractionData(
-        tessen,
+        tescord,
         interactionId,
         locale,
       );
@@ -453,7 +453,7 @@ function buildSubcommandOptionLocalizations(
 
         // Apply the same localization to all Discord locales for this language
         for (const discordLocale of discordLocales) {
-          // Option name localization: the option.name IS the key from Tessen's options object
+          // Option name localization: the option.name IS the key from Tescord's options object
           if (optionData.name) {
             nameLocalizations[discordLocale] = optionData.name;
           }
@@ -462,10 +462,10 @@ function buildSubcommandOptionLocalizations(
             descriptionLocalizations[discordLocale] = optionData.description;
           }
 
-          // Handle choice localizations: choice.value is the key from Tessen's choices object
+          // Handle choice localizations: choice.value is the key from Tescord's choices object
           if (optionData.choices && "choices" in option && option.choices) {
             for (const choice of option.choices) {
-              // choice.value is the key from our original choices object in Tessen
+              // choice.value is the key from our original choices object in Tescord
               const choiceKey = String(choice.value);
               const localizedChoiceName = optionData.choices[choiceKey];
               if (localizedChoiceName) {
@@ -546,7 +546,7 @@ function buildSubcommandOptionLocalizations(
 
 // Helper function to build localization maps for options
 function buildOptionLocalizations(
-  tessen: Tessen,
+  tescord: Tescord,
   options: readonly ApplicationCommandOptionData[],
   interactionId: string,
 ): ApplicationCommandOptionData[] {
@@ -563,9 +563,9 @@ function buildOptionLocalizations(
       const nameLocalizations: Record<string, string> = {};
       const descriptionLocalizations: Record<string, string> = {};
 
-      for (const [locale, _] of tessen.locales.interaction) {
+      for (const [locale, _] of tescord.locales.interaction) {
         const localizedData = getLocalizedInteractionData(
-          tessen,
+          tescord,
           interactionId,
           locale,
         );
@@ -597,7 +597,7 @@ function buildOptionLocalizations(
 
       // Recursively handle subcommands within the group - convert readonly to mutable
       const processedSubcommands = buildOptionLocalizations(
-        tessen,
+        tescord,
         option.options as readonly ApplicationCommandOptionData[],
         interactionId,
       );
@@ -619,9 +619,9 @@ function buildOptionLocalizations(
       const nameLocalizations: Record<string, string> = {};
       const descriptionLocalizations: Record<string, string> = {};
 
-      for (const [locale, _] of tessen.locales.interaction) {
+      for (const [locale, _] of tescord.locales.interaction) {
         const localizedData = getLocalizedInteractionData(
-          tessen,
+          tescord,
           interactionId,
           locale,
         );
@@ -653,7 +653,7 @@ function buildOptionLocalizations(
 
       // Handle the subcommand's options (these are regular options, not subcommands)
       const processedOptions = buildSubcommandOptionLocalizations(
-        tessen,
+        tescord,
         option.options as readonly ApplicationCommandOptionData[],
         interactionId,
       );
@@ -665,7 +665,7 @@ function buildOptionLocalizations(
 
     // Handle regular options (non-subcommand, non-subcommand-group)
     return buildSubcommandOptionLocalizations(
-      tessen,
+      tescord,
       [option],
       interactionId,
     )[0];
@@ -673,23 +673,23 @@ function buildOptionLocalizations(
 }
 
 export async function publishInteractions(
-  tessen: Tessen,
+  tescord: Tescord,
   guildId?: string,
 ) {
   // Group interactions by target client namespace
   const clientInteractions = new Map<string, any[]>();
 
   // Initialize all clients with empty arrays
-  for (const tessenClient of tessen.clients.values()) {
-    clientInteractions.set(tessenClient.id, []);
+  for (const tescordClient of tescord.clients.values()) {
+    clientInteractions.set(tescordClient.id, []);
   }
 
   // Get first client as default
-  const firstClient = tessen.clients.first();
+  const firstClient = tescord.clients.first();
   const defaultClientId = firstClient?.id;
 
   if (!defaultClientId) {
-    tessen.events.emit("tessen:interactionsPublishError", {
+    tescord.events.emit("tescord:interactionsPublishError", {
       clientId: "unknown",
       error: new Error("No clients available for publishing interactions"),
     });
@@ -702,7 +702,7 @@ export async function publishInteractions(
     Map<string, { command: SlashCommand; combinations: string[] }[]>
   > = new Map();
 
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interaction = cachedInteraction.data;
 
     if ("nameCombinations" in interaction && interaction.type === "ChatInput") {
@@ -773,7 +773,7 @@ export async function publishInteractions(
         }
       }
 
-      const command: TessenApplicationCommand = {
+      const command: TescordApplicationCommand = {
         name: baseCommandName,
         description: bestDescription,
         type: ApplicationCommandType.ChatInput,
@@ -874,9 +874,9 @@ export async function publishInteractions(
         // Add localization for subcommand name and description
         const subcommandNameLocalizations: Record<string, string> = {};
         const subcommandDescriptionLocalizations: Record<string, string> = {};
-        for (const [locale, _] of tessen.locales.interaction) {
+        for (const [locale, _] of tescord.locales.interaction) {
           const localizedParts = getLocalizedNameParts(
-            tessen,
+            tescord,
             sourceCommand.id,
             subcommandCombination,
             locale,
@@ -891,7 +891,7 @@ export async function publishInteractions(
 
           // Get description localization from main command data for this combination
           const localizedData = getLocalizedInteractionData(
-            tessen,
+            tescord,
             sourceCommand.id,
             locale,
           );
@@ -946,9 +946,9 @@ export async function publishInteractions(
         const groupDescriptionLocalizations: Record<string, string> = {};
         // Use the first combination in the group to get the group name localization
         const firstCombination = groupCombinationsData[0].combination;
-        for (const [locale, _] of tessen.locales.interaction) {
+        for (const [locale, _] of tescord.locales.interaction) {
           const localizedParts = getLocalizedNameParts(
-            tessen,
+            tescord,
             firstGroupCommand.id,
             firstCombination,
             locale,
@@ -963,7 +963,7 @@ export async function publishInteractions(
 
           // Get description localization from main command data
           const localizedData = getLocalizedInteractionData(
-            tessen,
+            tescord,
             firstGroupCommand.id,
             locale,
           );
@@ -1015,9 +1015,9 @@ export async function publishInteractions(
           // Add localization for subcommand name and description within group
           const subcommandNameLocalizations: Record<string, string> = {};
           const subcommandDescriptionLocalizations: Record<string, string> = {};
-          for (const [locale, _] of tessen.locales.interaction) {
+          for (const [locale, _] of tescord.locales.interaction) {
             const localizedParts = getLocalizedNameParts(
-              tessen,
+              tescord,
               sourceCommand.id,
               groupCombination,
               locale,
@@ -1033,7 +1033,7 @@ export async function publishInteractions(
 
             // Get description localization from main command data for this combination
             const localizedData = getLocalizedInteractionData(
-              tessen,
+              tescord,
               sourceCommand.id,
               locale,
             );
@@ -1079,7 +1079,7 @@ export async function publishInteractions(
       // Apply localizations for the base command using the first command's ID
       const firstCommandId = firstCommand.id;
       const commandLocalizations = localizeCommand(
-        tessen,
+        tescord,
         command,
         firstCommandId,
         baseCommandName,
@@ -1090,14 +1090,14 @@ export async function publishInteractions(
       const descriptionLocalizations: Record<string, string> = {};
 
       // Add base command name localizations - try all command entries for localization
-      for (const [locale, _] of tessen.locales.interaction) {
+      for (const [locale, _] of tescord.locales.interaction) {
         let baseLocalization: string | undefined;
 
         // Try to get localization from any command entry
         for (const entry of commandEntries) {
           for (const combination of entry.combinations) {
             const localizedParts = getLocalizedNameParts(
-              tessen,
+              tescord,
               entry.command.id,
               combination,
               locale,
@@ -1138,7 +1138,7 @@ export async function publishInteractions(
       // Apply option localizations using the first command's interaction ID
       if (command.options && command.options.length > 0) {
         command.options = buildOptionLocalizations(
-          tessen,
+          tescord,
           command.options as readonly ApplicationCommandOptionData[],
           firstCommandId,
         );
@@ -1149,7 +1149,7 @@ export async function publishInteractions(
   }
 
   // Process context menu commands
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interaction = cachedInteraction.data;
 
     // Process user context menu commands with localization
@@ -1171,9 +1171,9 @@ export async function publishInteractions(
 
       // Add localizations for context menu using interaction ID
       const nameLocalizations: Record<string, string> = {};
-      for (const [locale, _] of tessen.locales.interaction) {
+      for (const [locale, _] of tescord.locales.interaction) {
         const localizedData = getLocalizedInteractionData(
-          tessen,
+          tescord,
           userContextMenu.id,
           locale,
         );
@@ -1217,9 +1217,9 @@ export async function publishInteractions(
 
       // Add localizations for context menu using interaction ID
       const nameLocalizations: Record<string, string> = {};
-      for (const [locale, _] of tessen.locales.interaction) {
+      for (const [locale, _] of tescord.locales.interaction) {
         const localizedData = getLocalizedInteractionData(
-          tessen,
+          tescord,
           messageContextMenu.id,
           locale,
         );
@@ -1252,9 +1252,9 @@ export async function publishInteractions(
   }
 
   // Collect all clients for publishing
-  const clients = Array.from(tessen.clients.values()).map((tessenClient: TessenClient) => ({
-    token: tessenClient.client.token!,
-    namespace: tessenClient.id,
+  const clients = Array.from(tescord.clients.values()).map((tescordClient: TescordClient) => ({
+    token: tescordClient.client.token!,
+    namespace: tescordClient.id,
   }));
 
   // Determine publish type
@@ -1275,7 +1275,7 @@ export async function publishInteractions(
             body: convertToSnakeCase(body[client.namespace] || []),
           });
 
-          tessen.events.emit("tessen:interactionsPublished", {
+          tescord.events.emit("tescord:interactionsPublished", {
             clientId: client.namespace,
             count: (body[client.namespace] || []).length,
           });
@@ -1286,7 +1286,7 @@ export async function publishInteractions(
             body: convertToSnakeCase(body[client.namespace] || []),
           });
 
-          tessen.events.emit("tessen:interactionsPublished", {
+          tescord.events.emit("tescord:interactionsPublished", {
             clientId: client.namespace,
             count: (body[client.namespace] || []).length,
           });
@@ -1298,7 +1298,7 @@ export async function publishInteractions(
         `Failed to publish interactions for client '${client.namespace}':`,
         error,
       );
-      tessen.events.emit("tessen:interactionsPublishError", {
+      tescord.events.emit("tescord:interactionsPublishError", {
         clientId: client.namespace,
         error: error as Error,
       });

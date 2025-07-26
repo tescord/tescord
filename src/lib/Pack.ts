@@ -107,7 +107,7 @@ export class Pack<
   }
 
   constructor(public config: Config) {
-    if (config.id === "tessen") throw new Error("Pack id cannot be 'tessen'.");
+    if (config.id === "tescord") throw new Error("Pack id cannot be 'tescord'.");
   }
 
   // Override emit to propagate events to all subpacks

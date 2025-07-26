@@ -1,4 +1,4 @@
-import { Tessen, TessenClient } from "$lib/Tessen";
+import { Tescord, TescordClient } from "$lib/Tescord";
 import { Interaction as DiscordInteraction, Guild, User } from "discord.js";
 import { ContentValue, GetLocalization } from "$lib/Locale";
 import { ChatInputInteractionWrapper, ButtonInteractionWrapper, StringSelectMenuInteractionWrapper, UserSelectMenuInteractionWrapper, RoleSelectMenuInteractionWrapper, ChannelSelectMenuInteractionWrapper, MentionableSelectMenuInteractionWrapper, ModalInteractionWrapper, UserContextMenuInteractionWrapper, MessageContextMenuInteractionWrapper, AutocompleteInteractionWrapper } from "$types/Interactions";
@@ -8,19 +8,19 @@ import { parseCustomData } from "$types/ComponentBuilder";
 
 // Helper function to create localization objects for interactions
 function createInteractionLocalizationObjects(
-  tessen: Tessen,
+  tescord: Tescord,
   guild: Guild | null,
   interaction: DiscordInteraction
 ) {
-  // Get default language from Tessen config, fallback to 'en'
-  const defaultLanguage = tessen.config.defaults?.language || 'en';
-  const defaultLocalization = tessen.locales.content.get(defaultLanguage) || {} as ContentValue;
+  // Get default language from Tescord config, fallback to 'en'
+  const defaultLanguage = tescord.config.defaults?.language || 'en';
+  const defaultLocalization = tescord.locales.content.get(defaultLanguage) || {} as ContentValue;
   
   const guildLocale = guild?.preferredLocale?.split('-')[0] || defaultLanguage;
   const userLocale = interaction.locale?.split('-')[0] || guildLocale;
   
-  const guildLocalization = tessen.locales.content.get(guildLocale) || defaultLocalization;
-  const userLocalization = tessen.locales.content.get(userLocale) || defaultLocalization;
+  const guildLocalization = tescord.locales.content.get(guildLocale) || defaultLocalization;
+  const userLocalization = tescord.locales.content.get(userLocale) || defaultLocalization;
 
   return {
     locale: {
@@ -32,12 +32,12 @@ function createInteractionLocalizationObjects(
 
 // Helper function to create base interaction context
 function createBaseInteractionContext(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   guild: Guild | null,
   interaction: DiscordInteraction
 ) {
-  const localizationObjects = createInteractionLocalizationObjects(tessen, guild, interaction);
+  const localizationObjects = createInteractionLocalizationObjects(tescord, guild, interaction);
   
   return {
     client,
@@ -46,36 +46,36 @@ function createBaseInteractionContext(
 }
 
 export async function handleInteraction(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: DiscordInteraction
 ) {
   try {
     if (interaction.isAutocomplete()) {
-      await handleAutocompleteInteraction(tessen, client, interaction);
+      await handleAutocompleteInteraction(tescord, client, interaction);
     } else if (interaction.isChatInputCommand()) {
-      await handleChatInputCommand(tessen, client, interaction);
+      await handleChatInputCommand(tescord, client, interaction);
     } else if (interaction.isUserContextMenuCommand()) {
-      await handleUserContextMenuCommand(tessen, client, interaction);
+      await handleUserContextMenuCommand(tescord, client, interaction);
     } else if (interaction.isMessageContextMenuCommand()) {
-      await handleMessageContextMenuCommand(tessen, client, interaction);
+      await handleMessageContextMenuCommand(tescord, client, interaction);
     } else if (interaction.isButton()) {
-      await handleButtonInteraction(tessen, client, interaction);
+      await handleButtonInteraction(tescord, client, interaction);
     } else if (interaction.isStringSelectMenu()) {
-      await handleStringSelectMenuInteraction(tessen, client, interaction);
+      await handleStringSelectMenuInteraction(tescord, client, interaction);
     } else if (interaction.isUserSelectMenu()) {
-      await handleUserSelectMenuInteraction(tessen, client, interaction);
+      await handleUserSelectMenuInteraction(tescord, client, interaction);
     } else if (interaction.isRoleSelectMenu()) {
-      await handleRoleSelectMenuInteraction(tessen, client, interaction);
+      await handleRoleSelectMenuInteraction(tescord, client, interaction);
     } else if (interaction.isChannelSelectMenu()) {
-      await handleChannelSelectMenuInteraction(tessen, client, interaction);
+      await handleChannelSelectMenuInteraction(tescord, client, interaction);
     } else if (interaction.isMentionableSelectMenu()) {
-      await handleMentionableSelectMenuInteraction(tessen, client, interaction);
+      await handleMentionableSelectMenuInteraction(tescord, client, interaction);
     } else if (interaction.isModalSubmit()) {
-      await handleModalSubmitInteraction(tessen, client, interaction);
+      await handleModalSubmitInteraction(tescord, client, interaction);
     }
   } catch (error) {
-    tessen.events.emit('tessen:interactionHandlerError', {
+    tescord.events.emit('tescord:interactionHandlerError', {
       error,
       interaction,
       client
@@ -84,8 +84,8 @@ export async function handleInteraction(
 }
 
 async function handleAutocompleteInteraction(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: AutocompleteInteraction
 ) {
   const commandName = interaction.commandName;
@@ -120,7 +120,7 @@ async function handleAutocompleteInteraction(
   };
 
   const baseContext = createBaseInteractionContext(
-    tessen,
+    tescord,
     client,
     interaction.guild,
     interaction
@@ -135,7 +135,7 @@ async function handleAutocompleteInteraction(
   };
 
   // Find the matching slash command
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
     
     // Check if it's a slash command with nameCombinations property
@@ -164,7 +164,7 @@ async function handleAutocompleteInteraction(
           await interaction.respond(discordChoices);
           return;
         } catch (error) {
-          tessen.events.emit('tessen:autocompleteError', {
+          tescord.events.emit('tescord:autocompleteError', {
             error,
             interaction,
             option: focusedOption.name,
@@ -182,8 +182,8 @@ async function handleAutocompleteInteraction(
 }
 
 async function handleChatInputCommand(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: ChatInputInteractionWrapper['interaction']
 ) {
   const commandName = interaction.commandName;
@@ -196,7 +196,7 @@ async function handleChatInputCommand(
   if (subcommand) fullCommandName += ` ${subcommand}`;
 
   const baseContext = createBaseInteractionContext(
-    tessen,
+    tescord,
     client,
     interaction.guild,
     interaction
@@ -210,7 +210,7 @@ async function handleChatInputCommand(
   };
 
   // Check cached interactions for slash commands
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
     
     // Check if it's a slash command with nameCombinations property
@@ -223,7 +223,7 @@ async function handleChatInputCommand(
   }
 
   // Check inspectors for chat input patterns
-  for (const [key, cachedInspector] of tessen.cache.inspectors) {
+  for (const [key, cachedInspector] of tescord.cache.inspectors) {
     const inspector = cachedInspector.data;
     const result = await inspector.emit({
       type: 'chatInput',
@@ -235,14 +235,14 @@ async function handleChatInputCommand(
 }
 
 async function handleUserContextMenuCommand(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: UserContextMenuInteractionWrapper['interaction']
 ) {
   const commandName = interaction.commandName;
 
   const baseContext = createBaseInteractionContext(
-    tessen,
+    tescord,
     client,
     interaction.guild,
     interaction
@@ -256,7 +256,7 @@ async function handleUserContextMenuCommand(
   };
 
   // Check cached interactions for user context menu commands
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
     
     if (interactionData.type === 'User' && interactionData.name === commandName) {
@@ -266,7 +266,7 @@ async function handleUserContextMenuCommand(
   }
 
   // Check inspectors for user context menu handlers
-  for (const [key, cachedInspector] of tessen.cache.inspectors) {
+  for (const [key, cachedInspector] of tescord.cache.inspectors) {
     const inspector = cachedInspector.data;
     const result = await inspector.emit({
       type: 'userContextMenu',
@@ -278,14 +278,14 @@ async function handleUserContextMenuCommand(
 }
 
 async function handleMessageContextMenuCommand(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: MessageContextMenuInteractionWrapper['interaction']
 ) {
   const commandName = interaction.commandName;
 
   const baseContext = createBaseInteractionContext(
-    tessen,
+    tescord,
     client,
     interaction.guild,
     interaction
@@ -299,7 +299,7 @@ async function handleMessageContextMenuCommand(
   };
 
   // Check cached interactions for message context menu commands
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
     
     if (interactionData.type === 'Message' && interactionData.name === commandName) {
@@ -309,7 +309,7 @@ async function handleMessageContextMenuCommand(
   }
 
   // Check inspectors for message context menu handlers
-  for (const [key, cachedInspector] of tessen.cache.inspectors) {
+  for (const [key, cachedInspector] of tescord.cache.inspectors) {
     const inspector = cachedInspector.data;
     const result = await inspector.emit({
       type: 'messageContextMenu',
@@ -321,14 +321,14 @@ async function handleMessageContextMenuCommand(
 }
 
 async function handleButtonInteraction(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: ButtonInteractionWrapper['interaction']
 ) {
-  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tessen.events);
+  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
   
   const baseContext = createBaseInteractionContext(
-    tessen,
+    tescord,
     client,
     interaction.guild,
     interaction
@@ -343,7 +343,7 @@ async function handleButtonInteraction(
   };
 
   // Check cached interactions for button handlers registered via Pack
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
     
     if (interactionData.type === 'Button' && interactionData.id === baseCustomId) {
@@ -353,7 +353,7 @@ async function handleButtonInteraction(
   }
 
   // Check inspectors for button handlers
-  for (const [key, cachedInspector] of tessen.cache.inspectors) {
+  for (const [key, cachedInspector] of tescord.cache.inspectors) {
     const inspector = cachedInspector.data;
     const result = await inspector.emit({
       type: 'button',
@@ -365,14 +365,14 @@ async function handleButtonInteraction(
 }
 
 async function handleStringSelectMenuInteraction(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: StringSelectMenuInteractionWrapper['interaction']
 ) {
-  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tessen.events);
+  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
   
   const baseContext = createBaseInteractionContext(
-    tessen,
+    tescord,
     client,
     interaction.guild,
     interaction
@@ -387,7 +387,7 @@ async function handleStringSelectMenuInteraction(
   };
 
   // Check cached interactions for string select menu handlers registered via Pack
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
     
     if (interactionData.type === 'StringSelectMenu' && interactionData.id === baseCustomId) {
@@ -397,7 +397,7 @@ async function handleStringSelectMenuInteraction(
   }
 
   // Check inspectors for string select menu handlers
-  for (const [key, cachedInspector] of tessen.cache.inspectors) {
+  for (const [key, cachedInspector] of tescord.cache.inspectors) {
     const inspector = cachedInspector.data;
     const result = await inspector.emit({
       type: 'stringSelectMenu',
@@ -409,14 +409,14 @@ async function handleStringSelectMenuInteraction(
 }
 
 async function handleUserSelectMenuInteraction(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: UserSelectMenuInteractionWrapper['interaction']
 ) {
-  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tessen.events);
+  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
   
   const baseContext = createBaseInteractionContext(
-    tessen,
+    tescord,
     client,
     interaction.guild,
     interaction
@@ -431,7 +431,7 @@ async function handleUserSelectMenuInteraction(
   };
 
   // Check cached interactions for user select menu handlers registered via Pack
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
     
     if (interactionData.type === 'UserSelectMenu' && interactionData.id === baseCustomId) {
@@ -441,7 +441,7 @@ async function handleUserSelectMenuInteraction(
   }
 
   // Check inspectors for user select menu handlers
-  for (const [key, cachedInspector] of tessen.cache.inspectors) {
+  for (const [key, cachedInspector] of tescord.cache.inspectors) {
     const inspector = cachedInspector.data;
     const result = await inspector.emit({
       type: 'userSelectMenu',
@@ -453,14 +453,14 @@ async function handleUserSelectMenuInteraction(
 }
 
 async function handleRoleSelectMenuInteraction(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: RoleSelectMenuInteractionWrapper['interaction']
 ) {
-  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tessen.events);
+  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
   
   const baseContext = createBaseInteractionContext(
-    tessen,
+    tescord,
     client,
     interaction.guild,
     interaction
@@ -475,7 +475,7 @@ async function handleRoleSelectMenuInteraction(
   };
 
   // Check cached interactions for role select menu handlers registered via Pack
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
     
     if (interactionData.type === 'RoleSelectMenu' && interactionData.id === baseCustomId) {
@@ -485,7 +485,7 @@ async function handleRoleSelectMenuInteraction(
   }
 
   // Check inspectors for role select menu handlers
-  for (const [key, cachedInspector] of tessen.cache.inspectors) {
+  for (const [key, cachedInspector] of tescord.cache.inspectors) {
     const inspector = cachedInspector.data;
     const result = await inspector.emit({
       type: 'roleSelectMenu',
@@ -497,14 +497,14 @@ async function handleRoleSelectMenuInteraction(
 }
 
 async function handleChannelSelectMenuInteraction(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: ChannelSelectMenuInteractionWrapper['interaction']
 ) {
-  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tessen.events);
+  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
   
   const baseContext = createBaseInteractionContext(
-    tessen,
+    tescord,
     client,
     interaction.guild,
     interaction
@@ -519,7 +519,7 @@ async function handleChannelSelectMenuInteraction(
   };
 
   // Check cached interactions for channel select menu handlers registered via Pack
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
     
     if (interactionData.type === 'ChannelSelectMenu' && interactionData.id === baseCustomId) {
@@ -529,7 +529,7 @@ async function handleChannelSelectMenuInteraction(
   }
 
   // Check inspectors for channel select menu handlers
-  for (const [key, cachedInspector] of tessen.cache.inspectors) {
+  for (const [key, cachedInspector] of tescord.cache.inspectors) {
     const inspector = cachedInspector.data;
     const result = await inspector.emit({
       type: 'channelSelectMenu',
@@ -541,14 +541,14 @@ async function handleChannelSelectMenuInteraction(
 }
 
 async function handleMentionableSelectMenuInteraction(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: MentionableSelectMenuInteractionWrapper['interaction']
 ) {
-  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tessen.events);
+  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
   
   const baseContext = createBaseInteractionContext(
-    tessen,
+    tescord,
     client,
     interaction.guild,
     interaction
@@ -563,7 +563,7 @@ async function handleMentionableSelectMenuInteraction(
   };
 
   // Check cached interactions for mentionable select menu handlers registered via Pack
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
     
     if (interactionData.type === 'MentionableSelectMenu' && interactionData.id === baseCustomId) {
@@ -573,7 +573,7 @@ async function handleMentionableSelectMenuInteraction(
   }
 
   // Check inspectors for mentionable select menu handlers
-  for (const [key, cachedInspector] of tessen.cache.inspectors) {
+  for (const [key, cachedInspector] of tescord.cache.inspectors) {
     const inspector = cachedInspector.data;
     const result = await inspector.emit({
       type: 'mentionableSelectMenu',
@@ -585,14 +585,14 @@ async function handleMentionableSelectMenuInteraction(
 }
 
 async function handleModalSubmitInteraction(
-  tessen: Tessen,
-  client: TessenClient,
+  tescord: Tescord,
+  client: TescordClient,
   interaction: ModalInteractionWrapper['interaction']
 ) {
-  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tessen.events);
+  const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
   
   const baseContext = createBaseInteractionContext(
-    tessen,
+    tescord,
     client,
     interaction.guild,
     interaction
@@ -607,7 +607,7 @@ async function handleModalSubmitInteraction(
   };
 
   // Check cached interactions for modal handlers registered via Pack
-  for (const [key, cachedInteraction] of tessen.cache.interactions) {
+  for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
     
     if (interactionData.type === 'Modal' && interactionData.id === baseCustomId) {
@@ -617,7 +617,7 @@ async function handleModalSubmitInteraction(
   }
 
   // Check inspectors for modal handlers
-  for (const [key, cachedInspector] of tessen.cache.inspectors) {
+  for (const [key, cachedInspector] of tescord.cache.inspectors) {
     const inspector = cachedInspector.data;
     const result = await inspector.emit({
       type: 'modal',

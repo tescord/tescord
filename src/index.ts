@@ -4,7 +4,7 @@ import "./colors";
 export * from "./exports";
 
 export * from "$lib/Pack";
-export * from "$lib/Tessen";
+export * from "$lib/Tescord";
 export * from "$lib/Locale";
 export * from "$lib/Inspector";
 

@@ -284,13 +284,13 @@ export class Locale implements Identifiable {
 export type CommandInteractionLocale = {
     names?: { [k: string]: string }; // Multiple patterns for single command translations
     description?: string; // Description of the command
-    options?: { [optionName: string]: CommandInteractionLocaleOption }; // Key is the option name (from Tessen's options object keys)
+    options?: { [optionName: string]: CommandInteractionLocaleOption }; // Key is the option name (from Tescord's options object keys)
 }
 
 export type CommandInteractionLocaleOption = {
     name?: string; // Localized name for the option
     description?: string; // Localized description for the option
-    // Keys are the choice values (keys from Tessen's choices object), values are the localized display names
+    // Keys are the choice values (keys from Tescord's choices object), values are the localized display names
     choices?: { [choiceKey: string]: string };
 }
 
@@ -301,10 +301,10 @@ export type ContextMenuLocale = {
 
 export type InteractionLocaleData = CommandInteractionLocale | ContextMenuLocale;
 
-export type GetLocalization = Tessen.Localization;
+export type GetLocalization = Tescord.Localization;
 
 declare global {
-    namespace Tessen {
+    namespace Tescord {
         interface Localization extends ContentValue {}
     }
 }

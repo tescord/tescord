@@ -1,6 +1,6 @@
 import { ApplicationCommandPermissionsUpdateData, AutoModerationActionExecution, AutoModerationRule, NonThreadGuildBasedChannel, DMChannel, TextBasedChannel, GuildEmoji, Entitlement, GuildAuditLogsEntry, Guild, GuildBan, GuildMember, PartialGuildMember, ReadonlyCollection, Snowflake, GuildMembersChunk, GuildSoundboardSound, PartialSoundboardSound, Invite, OmitPartialGroupDMChannel, Message, PartialMessage, PollAnswer, MessageReaction, PartialMessageReaction, GuildTextBasedChannel, User, PartialUser, MessageReactionEventDetails, Presence, Client, Role, AnyThreadChannel, ThreadMember, PartialThreadMember, Typing, VoiceChannelEffect, VoiceState, TextChannel, NewsChannel, VoiceChannel, ForumChannel, MediaChannel, Interaction, CloseEvent, StageInstance, Sticker, Subscription, GuildScheduledEvent, PartialGuildScheduledEvent } from "discord.js";
 
-export interface TessenClientEvents {
+export interface TescordClientEvents {
   applicationCommandPermissionsUpdate: { data: ApplicationCommandPermissionsUpdateData };
   autoModerationActionExecution: { autoModerationActionExecution: AutoModerationActionExecution };
   autoModerationRuleCreate: { autoModerationRule: AutoModerationRule };
@@ -97,7 +97,7 @@ export interface TessenClientEvents {
   voiceChannelEffectSend: { voiceChannelEffect: VoiceChannelEffect };
   voiceStateUpdate: { oldState: VoiceState, newState: VoiceState };
   
-  webhookUpdate: TessenClientEvents['webhooksUpdate'];
+  webhookUpdate: TescordClientEvents['webhooksUpdate'];
   webhooksUpdate: { channel: TextChannel | NewsChannel | VoiceChannel | ForumChannel | MediaChannel };
   interactionCreate: { interaction: Interaction };
   shardDisconnect: { closeEvent: CloseEvent, shardId: number };
@@ -125,7 +125,7 @@ export interface TessenClientEvents {
   soundboardSounds: { soundboardSounds: ReadonlyCollection<Snowflake, GuildSoundboardSound>, guild: Guild };
 }
 
-export const TessenClientEventMap = {
+export const TescordClientEventMap = {
   "applicationCommandPermissionsUpdate": [
     "data"
   ],

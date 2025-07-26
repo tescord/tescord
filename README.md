@@ -1,4 +1,4 @@
-# Tescord – The Official Discord Framework Continuing Where Tessen Left Off
+# Tescord – The Official Discord Framework Continuing Where Tescord Left Off
 
 A Discord.js based library for creating bots with a syntax similar to Express.js. Tescord allows for easy creation of packs, inspectors, and locales, and supports chat commands, slash commands, and interaction handling.
 

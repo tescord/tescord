@@ -6,7 +6,7 @@ import {
   SelectMenuComponentOptions,
   ModalComponentOptions,
 } from "./ComponentOptions";
-import { TessenClient } from "$lib/Tessen";
+import { TescordClient } from "$lib/Tescord";
 import {
   ChatInputCommandInteraction,
   ButtonInteraction,
@@ -32,7 +32,7 @@ type LocalizationGetter = {
 
 // Base context interface that includes common properties for all interactions
 interface BaseInteractionContext extends LocalizationGetter {
-  client: TessenClient;
+  client: TescordClient;
 }
 
 export interface ChatInputInteractionWrapper

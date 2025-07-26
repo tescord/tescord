@@ -1,5 +1,5 @@
 import { GetLocalization } from "$lib/Locale";
-import { TessenClientEvents } from "./ClientEvents";
+import { TescordClientEvents } from "./ClientEvents";
 import { Guild, User } from "discord.js";
 
 // Localization helper type for events
@@ -15,11 +15,11 @@ export type EnhancedEventContext<T> = T & EventLocalizationGetter;
 
 // Extract event context types from the generated ClientEvents with localization
 export type EventContextMap = {
-  [K in keyof TessenClientEvents]: EnhancedEventContext<TessenClientEvents[K]>;
+  [K in keyof TescordClientEvents]: EnhancedEventContext<TescordClientEvents[K]>;
 };
 
 // Generic event registration config with automatic context type inference and localization
-export interface EventRegistrationConfig<T extends keyof TessenClientEvents> {
+export interface EventRegistrationConfig<T extends keyof TescordClientEvents> {
   event: T;
   handle: (ctx: EventContextMap[T]) => void | Promise<void>;
 }
@@ -32,7 +32,7 @@ export interface CustomEventRegistrationConfig<T = any> {
 
 // Union type for all event registration configs
 export type AnyEventRegistrationConfig = 
-  | { [K in keyof TessenClientEvents]: EventRegistrationConfig<K> }[keyof TessenClientEvents];
+  | { [K in keyof TescordClientEvents]: EventRegistrationConfig<K> }[keyof TescordClientEvents];
 
 // Event data interface for storage
 export interface EventData {

@@ -2,7 +2,7 @@ import { Pack } from "$lib/Pack";
 import { Client, ClientOptions, Collection } from "discord.js";
 import { defaultify } from "stuffs"
 import { handleEvent } from "$utils/handleEvent";
-import { TessenClientEventMap } from "$types/ClientEvents";
+import { TescordClientEventMap } from "$types/ClientEvents";
 import { Interaction } from "$types/Interactions";
 import { EventData } from "$types/Events";
 import { Inspector } from "$lib/Inspector";
@@ -14,12 +14,12 @@ import { ComponentType, ButtonStyle, ModalComponentData } from "discord.js";
 import { PackEventMap } from "$types/PackEvents";
 import { ResultEventEmitter } from "$types/ResultEventEmitter";
 
-export type TessenConfigClient = { id: string, options: ClientOptions, token: string };
-export type TessenClient = { id: string, client: Client, token: string };
+export type TescordConfigClient = { id: string, options: ClientOptions, token: string };
+export type TescordClient = { id: string, client: Client, token: string };
 
-export interface TessenConfig {
+export interface TescordConfig {
   id: string;
-  clients: TessenConfigClient[];
+  clients: TescordConfigClient[];
   defaults?: {
     language?: Language;
   };
@@ -32,7 +32,7 @@ export type CacheData<T> = {
   data: T;
 }
 
-export class Tessen extends Pack<TessenConfig> {
+export class Tescord extends Pack<TescordConfig> {
 
   // Note: We inherit the propagating event system from Pack
   // No need to override events property as Pack already handles propagation
@@ -50,9 +50,9 @@ export class Tessen extends Pack<TessenConfig> {
     interaction: new Collection<string, Record<string, InteractionLocaleData>>(),
   }
 
-  clients = new Collection<string, TessenClient>();
+  clients = new Collection<string, TescordClient>();
 
-  constructor(config: TessenConfig) {
+  constructor(config: TescordConfig) {
     super(config);
   }
 
@@ -112,8 +112,8 @@ export class Tessen extends Pack<TessenConfig> {
       }
     }
 
-    this.emitEvent('tessen:cacheRefreshed', { timestamp: Date.now() });
-    this.emitEvent('tessen:localesRefreshed', { contentLocales, interactionLocales });
+    this.emitEvent('tescord:cacheRefreshed', { timestamp: Date.now() });
+    this.emitEvent('tescord:localesRefreshed', { contentLocales, interactionLocales });
   }
 
   private pushCache(pack: Pack<any>, path: string[] = []) {
@@ -131,33 +131,33 @@ export class Tessen extends Pack<TessenConfig> {
   async start() {
     this.refreshClients();
     this.refresh();
-    for (const tessenClient of this.clients.values()) {
-      const originalEmit = tessenClient.client.emit.bind(tessenClient.client);
+    for (const tescordClient of this.clients.values()) {
+      const originalEmit = tescordClient.client.emit.bind(tescordClient.client);
 
-      tessenClient.client.emit = (event: string, ...args: unknown[]) => {
+      tescordClient.client.emit = (event: string, ...args: unknown[]) => {
         // Handle known Discord.js events through our system
-        if (event in TessenClientEventMap) {
-          handleEvent(this, tessenClient, event as keyof typeof TessenClientEventMap, args);
+        if (event in TescordClientEventMap) {
+          handleEvent(this, tescordClient, event as keyof typeof TescordClientEventMap, args);
         }
         
-        // Emit generic Tessen events with proper typing - NOW PROPAGATES to all subpacks automatically
-        this.events.emit("tessen:clientEvent", { client: tessenClient, event, args });
-        this.events.emit(`${tessenClient.id}:${event}` as const, { client: tessenClient, event, args });
+        // Emit generic Tescord events with proper typing - NOW PROPAGATES to all subpacks automatically
+        this.events.emit("tescord:clientEvent", { client: tescordClient, event, args });
+        this.events.emit(`${tescordClient.id}:${event}` as const, { client: tescordClient, event, args });
         
         return originalEmit(event, ...args);
       };
 
       // @ts-ignore
-      tessenClient.client._emit = originalEmit;
+      tescordClient.client._emit = originalEmit;
 
-      await tessenClient.client.login(tessenClient.token);
+      await tescordClient.client.login(tescordClient.token);
 
       // NOW PROPAGATES to all subpacks automatically
-      this.events.emit("tessen:clientReady", { client: tessenClient });
+      this.events.emit("tescord:clientReady", { client: tescordClient });
     }
 
     // NOW PROPAGATES to all subpacks automatically
-    this.events.emit("tessen:clientsReady", { clients: this.clients });
+    this.events.emit("tescord:clientsReady", { clients: this.clients });
   }
 
   async publish(guildId?: string) {
@@ -168,7 +168,7 @@ export class Tessen extends Pack<TessenConfig> {
       
       // Emit success events for each client - NOW PROPAGATES to all subpacks automatically
       for (const client of this.clients.values()) {
-        this.events.emit('tessen:interactionsPublished', { 
+        this.events.emit('tescord:interactionsPublished', { 
           clientId: client.id, 
           count: this.cache.interactions.size 
         });
@@ -176,7 +176,7 @@ export class Tessen extends Pack<TessenConfig> {
     } catch (error) {
       // Emit error events for each client - NOW PROPAGATES to all subpacks automatically
       for (const client of this.clients.values()) {
-        this.events.emit('tessen:interactionsPublishError', { 
+        this.events.emit('tescord:interactionsPublishError', { 
           clientId: client.id, 
           error: error as Error 
         });
@@ -486,7 +486,7 @@ export class Tessen extends Pack<TessenConfig> {
     this.clients.forEach((client) => {
       client.client.destroy();
       // NOW PROPAGATES to all subpacks automatically
-      this.events.emit("tessen:clientDestroy", { client });
+      this.events.emit("tescord:clientDestroy", { client });
     });
   }
 }

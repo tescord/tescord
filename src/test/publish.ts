@@ -1,8 +1,8 @@
-import { Tessen, Pack, Locale } from '../index';
+import { Tescord, Pack, Locale } from '../index';
 import { GatewayIntentBits, MessageFlags } from 'discord.js';
 
-// Create Tessen instance with multiple clients
-const tessen = new Tessen({
+// Create Tescord instance with multiple clients
+const tescord = new Tescord({
   id: 'TestBot',
   clients: [
     {
@@ -193,8 +193,8 @@ const helpCommandUnloader = commandPack.slashCommand({
 });
 
 // Use the pack and locales
-const packUnloader = tessen.use(commandPack);
-const localeUnloader = tessen.use(locales);
+const packUnloader = tescord.use(commandPack);
+const localeUnloader = tescord.use(locales);
 
 // Set up event handlers
 const readyUnloader = commandPack.event({
@@ -211,24 +211,24 @@ const interactionCreateUnloader = commandPack.event({
   }
 });
 
-// Set up Tessen event handlers
-tessen.events.on('tessen:interactionsPublished', (data) => {
+// Set up Tescord event handlers
+tescord.events.on('tescord:interactionsPublished', (data) => {
   console.log(`✅ Published ${data.count} commands to client ${data.clientId}`);
 });
 
-tessen.events.on('tessen:interactionsPublishError', (data) => {
+tescord.events.on('tescord:interactionsPublishError', (data) => {
   console.error(`❌ Failed to publish interactions for client ${data.clientId}:`, data.error);
 });
 
-tessen.events.on('tessen:publishWarning', (data) => {
+tescord.events.on('tescord:publishWarning', (data) => {
   console.warn(`⚠️ ${(data as any).message}`);
 });
 
-tessen.events.on('tessen:clientReady', (data) => {
+tescord.events.on('tescord:clientReady', (data) => {
   console.log(`🤖 Client ${data.client.id} is ready!`);
 });
 
-tessen.events.on('tessen:clientsReady', (data) => {
+tescord.events.on('tescord:clientsReady', (data) => {
   console.log(`🎉 All ${data.clients.size} clients are ready!`);
 });
 
@@ -249,8 +249,8 @@ function cleanup() {
   localeUnloaders.forEach(unloader => unloader());
   interactionLocaleUnloaders.forEach(unloader => unloader());
   
-  // Destroy tessen instance
-  tessen.destroy();
+  // Destroy tescord instance
+  tescord.destroy();
   
   console.log('✅ Cleanup complete!');
 }
@@ -262,14 +262,14 @@ process.on('SIGTERM', cleanup);
 // Start the bot
 async function start() {
   try {
-    console.log('🚀 Starting Tessen test bot...');
+    console.log('🚀 Starting Tescord test bot...');
     
     // Refresh clients before starting
-    tessen.refreshClients();
+    tescord.refreshClients();
     
     // Start all clients
-    await tessen.start();
-    await tessen.publish();
+    await tescord.start();
+    await tescord.publish();
     
     console.log('✨ Bot started successfully!');
     console.log('📋 Available commands:');
@@ -289,7 +289,7 @@ async function start() {
 }
 
 // Export for module usage
-export { tessen, cleanup };
+export { tescord, cleanup };
 
 // Start if run directly
 if (require.main === module) {

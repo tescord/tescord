@@ -19,9 +19,9 @@ let base = fs.readFileSync("./node_modules/discord.js/typings/index.d.ts", "utf-
 let typeContent = base
     .replaceAll("[", "{")
     .replaceAll("]", "}")
-    .replaceAll("ClientEvents", "TessenClientEvents")
+    .replaceAll("ClientEvents", "TescordClientEvents")
     .replace("interface", "export interface")
-    .replaceAll(/TessenClientEvents\{(["'][^\"\']+['"])\}/g, (match, m1) => {
+    .replaceAll(/TescordClientEvents\{(["'][^\"\']+['"])\}/g, (match, m1) => {
         return match.replace(/\{/, "[")
             .replace(/\}/, "]");
     })
@@ -36,7 +36,7 @@ const eventMap = Object.fromEntries([...(base.matchAll(/([a-zA-Z]+)\: (\[[^\]]+\
 if (!eventMap["webhookUpdate"])
     eventMap["webhookUpdate"] = eventMap["webhooksUpdate"];
 
-let mapContent = `export const TessenClientEventMap = ${JSON.stringify(eventMap, null, 2)}`
+let mapContent = `export const TescordClientEventMap = ${JSON.stringify(eventMap, null, 2)}`
 
 
 let blocks = typeContent
