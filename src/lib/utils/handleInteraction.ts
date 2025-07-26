@@ -15,10 +15,10 @@ function createInteractionLocalizationObjects(
   // Get default language from Tescord config, fallback to 'en'
   const defaultLanguage = tescord.config.defaults?.language || 'en';
   const defaultLocalization = tescord.locales.content.get(defaultLanguage) || {} as ContentValue;
-  
+
   const guildLocale = guild?.preferredLocale?.split('-')[0] || defaultLanguage;
   const userLocale = interaction.locale?.split('-')[0] || guildLocale;
-  
+
   const guildLocalization = tescord.locales.content.get(guildLocale) || defaultLocalization;
   const userLocalization = tescord.locales.content.get(userLocale) || defaultLocalization;
 
@@ -38,7 +38,7 @@ function createBaseInteractionContext(
   interaction: DiscordInteraction
 ) {
   const localizationObjects = createInteractionLocalizationObjects(tescord, guild, interaction);
-  
+
   return {
     client,
     ...localizationObjects
@@ -50,6 +50,16 @@ export async function handleInteraction(
   client: TescordClient,
   interaction: DiscordInteraction
 ) {
+  let extraContext: Record<string, any> = {};
+  for await (const result of tescord.emitToSubPacksWithAsyncIterator("beforeInteraction", { ...extraContext, interaction })) {
+    if (result === false) {
+      // Cancel event propagation if result is explicitly false
+      return;
+    }
+    if (result && typeof result === "object") {
+      Object.assign(extraContext, result);
+    }
+  }
   try {
     if (interaction.isAutocomplete()) {
       await handleAutocompleteInteraction(tescord, client, interaction);
@@ -91,14 +101,14 @@ async function handleAutocompleteInteraction(
   const commandName = interaction.commandName;
   const subcommand = interaction.options.getSubcommand(false);
   const subcommandGroup = interaction.options.getSubcommandGroup(false);
-  
+
   // Build full command name
   let fullCommandName = commandName;
   if (subcommandGroup) fullCommandName += ` ${subcommandGroup}`;
   if (subcommand) fullCommandName += ` ${subcommand}`;
 
   const discordFocusedOption = interaction.options.getFocused(true);
-  
+
   // Transform Discord.js enum type to our string type
   const getOptionTypeString = (type: ApplicationCommandOptionType): "String" | "Integer" | "Number" => {
     switch (type) {
@@ -137,13 +147,13 @@ async function handleAutocompleteInteraction(
   // Find the matching slash command
   for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
-    
+
     // Check if it's a slash command with nameCombinations property
-    if ('nameCombinations' in interactionData && 
-        interactionData.nameCombinations?.includes(fullCommandName) && 
-        (!interactionData.type || interactionData.type === 'ChatInput') &&
-        'options' in interactionData && interactionData.options) {
-      
+    if ('nameCombinations' in interactionData &&
+      interactionData.nameCombinations?.includes(fullCommandName) &&
+      (!interactionData.type || interactionData.type === 'ChatInput') &&
+      'options' in interactionData && interactionData.options) {
+
       const option = interactionData.options[focusedOption.name];
       if (option && 'autoComplete' in option && option.autoComplete) {
         try {
@@ -154,7 +164,7 @@ async function handleAutocompleteInteraction(
           };
 
           const choices = await option.autoComplete(autocompleteContext);
-          
+
           // Convert object-based choices to Discord.js format
           const discordChoices = Object.entries(choices).map(([value, name]) => ({
             name: String(name),
@@ -189,7 +199,7 @@ async function handleChatInputCommand(
   const commandName = interaction.commandName;
   const subcommand = interaction.options.getSubcommand(false);
   const subcommandGroup = interaction.options.getSubcommandGroup(false);
-  
+
   // Build full command name
   let fullCommandName = commandName;
   if (subcommandGroup) fullCommandName += ` ${subcommandGroup}`;
@@ -212,11 +222,11 @@ async function handleChatInputCommand(
   // Check cached interactions for slash commands
   for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
-    
+
     // Check if it's a slash command with nameCombinations property
-    if ('nameCombinations' in interactionData && 
-        interactionData.nameCombinations?.includes(fullCommandName) && 
-        (!interactionData.type || interactionData.type === 'ChatInput')) {
+    if ('nameCombinations' in interactionData &&
+      interactionData.nameCombinations?.includes(fullCommandName) &&
+      (!interactionData.type || interactionData.type === 'ChatInput')) {
       await interactionData.handle(wrapper);
       return;
     }
@@ -258,7 +268,7 @@ async function handleUserContextMenuCommand(
   // Check cached interactions for user context menu commands
   for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
-    
+
     if (interactionData.type === 'User' && interactionData.name === commandName) {
       await interactionData.handle(wrapper);
       return;
@@ -301,7 +311,7 @@ async function handleMessageContextMenuCommand(
   // Check cached interactions for message context menu commands
   for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
-    
+
     if (interactionData.type === 'Message' && interactionData.name === commandName) {
       await interactionData.handle(wrapper);
       return;
@@ -326,7 +336,7 @@ async function handleButtonInteraction(
   interaction: ButtonInteractionWrapper['interaction']
 ) {
   const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
-  
+
   const baseContext = createBaseInteractionContext(
     tescord,
     client,
@@ -345,7 +355,7 @@ async function handleButtonInteraction(
   // Check cached interactions for button handlers registered via Pack
   for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
-    
+
     if (interactionData.type === 'Button' && interactionData.id === baseCustomId) {
       await interactionData.handle(wrapper);
       return;
@@ -370,7 +380,7 @@ async function handleStringSelectMenuInteraction(
   interaction: StringSelectMenuInteractionWrapper['interaction']
 ) {
   const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
-  
+
   const baseContext = createBaseInteractionContext(
     tescord,
     client,
@@ -389,7 +399,7 @@ async function handleStringSelectMenuInteraction(
   // Check cached interactions for string select menu handlers registered via Pack
   for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
-    
+
     if (interactionData.type === 'StringSelectMenu' && interactionData.id === baseCustomId) {
       await interactionData.handle(wrapper);
       return;
@@ -414,7 +424,7 @@ async function handleUserSelectMenuInteraction(
   interaction: UserSelectMenuInteractionWrapper['interaction']
 ) {
   const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
-  
+
   const baseContext = createBaseInteractionContext(
     tescord,
     client,
@@ -433,7 +443,7 @@ async function handleUserSelectMenuInteraction(
   // Check cached interactions for user select menu handlers registered via Pack
   for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
-    
+
     if (interactionData.type === 'UserSelectMenu' && interactionData.id === baseCustomId) {
       await interactionData.handle(wrapper);
       return;
@@ -458,7 +468,7 @@ async function handleRoleSelectMenuInteraction(
   interaction: RoleSelectMenuInteractionWrapper['interaction']
 ) {
   const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
-  
+
   const baseContext = createBaseInteractionContext(
     tescord,
     client,
@@ -477,7 +487,7 @@ async function handleRoleSelectMenuInteraction(
   // Check cached interactions for role select menu handlers registered via Pack
   for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
-    
+
     if (interactionData.type === 'RoleSelectMenu' && interactionData.id === baseCustomId) {
       await interactionData.handle(wrapper);
       return;
@@ -502,7 +512,7 @@ async function handleChannelSelectMenuInteraction(
   interaction: ChannelSelectMenuInteractionWrapper['interaction']
 ) {
   const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
-  
+
   const baseContext = createBaseInteractionContext(
     tescord,
     client,
@@ -521,7 +531,7 @@ async function handleChannelSelectMenuInteraction(
   // Check cached interactions for channel select menu handlers registered via Pack
   for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
-    
+
     if (interactionData.type === 'ChannelSelectMenu' && interactionData.id === baseCustomId) {
       await interactionData.handle(wrapper);
       return;
@@ -546,7 +556,7 @@ async function handleMentionableSelectMenuInteraction(
   interaction: MentionableSelectMenuInteractionWrapper['interaction']
 ) {
   const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
-  
+
   const baseContext = createBaseInteractionContext(
     tescord,
     client,
@@ -565,7 +575,7 @@ async function handleMentionableSelectMenuInteraction(
   // Check cached interactions for mentionable select menu handlers registered via Pack
   for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
-    
+
     if (interactionData.type === 'MentionableSelectMenu' && interactionData.id === baseCustomId) {
       await interactionData.handle(wrapper);
       return;
@@ -590,7 +600,7 @@ async function handleModalSubmitInteraction(
   interaction: ModalInteractionWrapper['interaction']
 ) {
   const { id: baseCustomId, data } = await parseCustomData(interaction.customId, tescord.events);
-  
+
   const baseContext = createBaseInteractionContext(
     tescord,
     client,
@@ -609,7 +619,7 @@ async function handleModalSubmitInteraction(
   // Check cached interactions for modal handlers registered via Pack
   for (const [key, cachedInteraction] of tescord.cache.interactions) {
     const interactionData = cachedInteraction.data;
-    
+
     if (interactionData.type === 'Modal' && interactionData.id === baseCustomId) {
       await interactionData.handle(wrapper);
       return;

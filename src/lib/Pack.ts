@@ -111,7 +111,7 @@ export class Pack<
   }
 
   // Override emit to propagate events to all subpacks
-  private emitToSubPacks<K extends keyof PackEventMap>(
+  emitToSubPacks<K extends keyof PackEventMap>(
     event: K,
     ...args: PackEventMap[K]
   ): void {
@@ -125,7 +125,7 @@ export class Pack<
   }
 
   // Enhanced emit that can collect results from subpacks with async iterator
-  private async *emitToSubPacksWithAsyncIterator<K extends keyof PackEventMap>(
+  async *emitToSubPacksWithAsyncIterator<K extends keyof PackEventMap>(
     event: K,
     ...args: PackEventMap[K]
   ): AsyncIterableIterator<unknown> {
@@ -146,7 +146,7 @@ export class Pack<
   }
 
   // Enhanced async emit that can collect results from subpacks
-  private async emitToSubPacksWithResultsAsync<K extends keyof PackEventMap>(
+  async emitToSubPacksWithResultsAsync<K extends keyof PackEventMap>(
     event: K,
     ...args: PackEventMap[K]
   ): Promise<unknown[]> {

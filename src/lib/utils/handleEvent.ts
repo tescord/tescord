@@ -57,10 +57,10 @@ function createEventLocalizationObjects(
   // Get default language from Tescord config, fallback to 'en'
   const defaultLanguage = tescord.config.defaults?.language || 'en';
   const defaultLocalization = tescord.locales.content.get(defaultLanguage) || {} as ContentValue;
-  
+
   const guildLocale = guild?.preferredLocale?.split('-')[0] || defaultLanguage;
   const userLocale = interaction?.locale?.split('-')[0] || guildLocale;
-  
+
   const guildLocalization = tescord.locales.content.get(guildLocale) || defaultLocalization;
   const userLocalization = tescord.locales.content.get(userLocale) || defaultLocalization;
 
@@ -102,6 +102,16 @@ export async function handleEvent(
       interaction
     );
 
+    for await (const result of tescord.emitToSubPacksWithAsyncIterator("beforeEvent", { ...context, eventName })) {
+      if (result === false) {
+        // Cancel event propagation if result is explicitly false
+        return;
+      }
+      if (result && typeof result === "object") {
+        Object.assign(context, result);
+      }
+    }
+
     const enhancedContext = {
       ...context,
       ...localizationObjects
@@ -110,15 +120,20 @@ export async function handleEvent(
     // Handle registered events
     for (const [key, cachedEvent] of tescord.cache.events) {
       const eventData = cachedEvent.data;
-      
+
       if (eventData.event === eventName) {
+        for await (const result of tescord.emitToSubPacksWithAsyncIterator("beforeEventHandle", { ...context, eventName })) {
+          if (result === false) {
+            continue;
+          }
+        }
         await eventData.handle(enhancedContext);
       }
     }
 
     // Emit to pack event emitters
     tescord.events.emit(eventName, enhancedContext);
-    
+
   } catch (error) {
     tescord.events.emit('tescord:eventHandlerError', {
       error,
