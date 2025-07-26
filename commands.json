@@ -1,0 +1,284 @@
+[
+  {
+    "name": "lookup",
+    "description": "Select your gender",
+    "type": 1,
+    "options": [
+      {
+        "name": "gender",
+        "description": "Select your gender",
+        "type": 1,
+        "options": [
+          {
+            "name": "choice",
+            "description": "Specify your gender",
+            "required": true,
+            "type": 3,
+            "choices": [
+              {
+                "name": "Male",
+                "value": "male",
+                "nameLocalizations": {
+                  "tr": "Erkek",
+                  "es-ES": "Masculino",
+                  "es-419": "Masculino"
+                }
+              },
+              {
+                "name": "Female",
+                "value": "female",
+                "nameLocalizations": {
+                  "tr": "Kadın",
+                  "es-ES": "Femenino",
+                  "es-419": "Femenino"
+                }
+              },
+              {
+                "name": "Other",
+                "value": "other",
+                "nameLocalizations": {
+                  "tr": "Diğer",
+                  "es-ES": "Otro",
+                  "es-419": "Otro"
+                }
+              }
+            ],
+            "nameLocalizations": {
+              "tr": "seçim",
+              "es-ES": "opcion",
+              "es-419": "opcion"
+            },
+            "descriptionLocalizations": {
+              "tr": "Cinsiyetinizi belirtin",
+              "es-ES": "Especifica tu género",
+              "es-419": "Especifica tu género"
+            }
+          }
+        ],
+        "nameLocalizations": {
+          "tr": "cinsiyet",
+          "es-ES": "género",
+          "es-419": "género"
+        }
+      },
+      {
+        "name": "genders",
+        "description": "Select your gender",
+        "type": 1,
+        "options": [
+          {
+            "name": "choice",
+            "description": "Specify your gender",
+            "required": true,
+            "type": 3,
+            "choices": [
+              {
+                "name": "Male",
+                "value": "male",
+                "nameLocalizations": {
+                  "tr": "Erkek",
+                  "es-ES": "Masculino",
+                  "es-419": "Masculino"
+                }
+              },
+              {
+                "name": "Female",
+                "value": "female",
+                "nameLocalizations": {
+                  "tr": "Kadın",
+                  "es-ES": "Femenino",
+                  "es-419": "Femenino"
+                }
+              },
+              {
+                "name": "Other",
+                "value": "other",
+                "nameLocalizations": {
+                  "tr": "Diğer",
+                  "es-ES": "Otro",
+                  "es-419": "Otro"
+                }
+              }
+            ],
+            "nameLocalizations": {
+              "tr": "seçim",
+              "es-ES": "opcion",
+              "es-419": "opcion"
+            },
+            "descriptionLocalizations": {
+              "tr": "Cinsiyetinizi belirtin",
+              "es-ES": "Especifica tu género",
+              "es-419": "Especifica tu género"
+            }
+          }
+        ],
+        "nameLocalizations": {
+          "tr": "cinsiyetler",
+          "es-ES": "géneros",
+          "es-419": "géneros"
+        }
+      }
+    ],
+    "defaultMemberPermissions": null,
+    "nsfw": false,
+    "nameLocalizations": {
+      "tr": "bakın",
+      "es-ES": "buscar",
+      "es-419": "buscar"
+    },
+    "descriptionLocalizations": {
+      "tr": "Cinsiyetinizi seçin",
+      "es-ES": "Selecciona tu género",
+      "es-419": "Selecciona tu género"
+    }
+  },
+  {
+    "name": "look",
+    "description": "Select your gender",
+    "type": 1,
+    "options": [
+      {
+        "name": "gender",
+        "description": "Select your gender",
+        "type": 1,
+        "options": [
+          {
+            "name": "choice",
+            "description": "Specify your gender",
+            "required": true,
+            "type": 3,
+            "choices": [
+              {
+                "name": "Male",
+                "value": "male",
+                "nameLocalizations": {
+                  "tr": "Erkek",
+                  "es-ES": "Masculino",
+                  "es-419": "Masculino"
+                }
+              },
+              {
+                "name": "Female",
+                "value": "female",
+                "nameLocalizations": {
+                  "tr": "Kadın",
+                  "es-ES": "Femenino",
+                  "es-419": "Femenino"
+                }
+              },
+              {
+                "name": "Other",
+                "value": "other",
+                "nameLocalizations": {
+                  "tr": "Diğer",
+                  "es-ES": "Otro",
+                  "es-419": "Otro"
+                }
+              }
+            ],
+            "nameLocalizations": {
+              "tr": "seçim",
+              "es-ES": "opcion",
+              "es-419": "opcion"
+            },
+            "descriptionLocalizations": {
+              "tr": "Cinsiyetinizi belirtin",
+              "es-ES": "Especifica tu género",
+              "es-419": "Especifica tu género"
+            }
+          }
+        ],
+        "nameLocalizations": {
+          "tr": "cinsiyet",
+          "es-ES": "género",
+          "es-419": "género"
+        }
+      },
+      {
+        "name": "genders",
+        "description": "Select your gender",
+        "type": 1,
+        "options": [
+          {
+            "name": "choice",
+            "description": "Specify your gender",
+            "required": true,
+            "type": 3,
+            "choices": [
+              {
+                "name": "Male",
+                "value": "male",
+                "nameLocalizations": {
+                  "tr": "Erkek",
+                  "es-ES": "Masculino",
+                  "es-419": "Masculino"
+                }
+              },
+              {
+                "name": "Female",
+                "value": "female",
+                "nameLocalizations": {
+                  "tr": "Kadın",
+                  "es-ES": "Femenino",
+                  "es-419": "Femenino"
+                }
+              },
+              {
+                "name": "Other",
+                "value": "other",
+                "nameLocalizations": {
+                  "tr": "Diğer",
+                  "es-ES": "Otro",
+                  "es-419": "Otro"
+                }
+              }
+            ],
+            "nameLocalizations": {
+              "tr": "seçim",
+              "es-ES": "opcion",
+              "es-419": "opcion"
+            },
+            "descriptionLocalizations": {
+              "tr": "Cinsiyetinizi belirtin",
+              "es-ES": "Especifica tu género",
+              "es-419": "Especifica tu género"
+            }
+          }
+        ],
+        "nameLocalizations": {
+          "tr": "cinsiyetler",
+          "es-ES": "géneros",
+          "es-419": "géneros"
+        }
+      }
+    ],
+    "defaultMemberPermissions": null,
+    "nsfw": false,
+    "nameLocalizations": {
+      "tr": "bak",
+      "es-ES": "ver",
+      "es-419": "ver"
+    },
+    "descriptionLocalizations": {
+      "tr": "Cinsiyetinizi seçin",
+      "es-ES": "Selecciona tu género",
+      "es-419": "Selecciona tu género"
+    }
+  },
+  {
+    "name": "ping",
+    "description": "Ping the bot",
+    "type": 1,
+    "options": [],
+    "defaultMemberPermissions": null,
+    "nsfw": false
+  },
+  {
+    "name": "help",
+    "description": "Get help information",
+    "type": 1,
+    "options": [],
+    "defaultMemberPermissions": null,
+    "nsfw": false
+  }
+]

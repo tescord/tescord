@@ -1,0 +1,2 @@
+- [x] Make generations can be modifieble from anywhere with declare module extending.
+- [] Make Result Event Emitter's type parameter should have return types of specific event. it should extend something like { [k: string]: () => {} }
