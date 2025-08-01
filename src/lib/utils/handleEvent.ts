@@ -102,7 +102,7 @@ export async function handleEvent(
       interaction
     );
 
-    for await (const result of tescord.emitToSubPacksWithAsyncIterator("beforeEvent", { ...context, eventName })) {
+    for await (const result of tescord.emitToSubPacksWithAsyncIterator("beforeEvent", { ...context, eventName, guild })) {
       if (result === false) {
         // Cancel event propagation if result is explicitly false
         return;
