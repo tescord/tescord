@@ -26,6 +26,10 @@ function extractContextInfo(eventName: string, args: any[]): { guild: Guild | nu
   // Try to extract guild from common patterns
   if (context.guild && typeof context.guild === 'object' && 'id' in context.guild) {
     guild = context.guild as Guild;
+  } else if (args[0] && args[0].guild && typeof args[0].guild === 'object' && 'id' in args[0].guild) {
+    guild = args[0].guild as Guild;
+  } else if (args[0] && args[0] instanceof Guild) {
+    guild = args[0] as Guild;
   } else if (context.member?.guild) {
     guild = context.member.guild;
   } else if (context.message?.guild) {
